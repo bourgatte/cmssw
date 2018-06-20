@@ -8,6 +8,8 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "CalibTracker/SiPixelQuality/interface/SiPixelStatusManager.h"
+#include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 
 class SiPixelStatusHarvester : public edm::EDAnalyzer {
  public:
@@ -30,7 +32,6 @@ class SiPixelStatusHarvester : public edm::EDAnalyzer {
  protected:
 
  private:
-  bool debug_;
   // Parameters
   std::string outputBase_;
   int aveDigiOcc_;
@@ -39,6 +40,8 @@ class SiPixelStatusHarvester : public edm::EDAnalyzer {
   std::string label_;  
   // harvest helper classs that setup the IOV structure
   SiPixelStatusManager siPixelStatusManager_;
+  // debug mode
+  bool debug_;
   // for DB output naming
   std::string recordName_;
 
@@ -48,9 +51,8 @@ class SiPixelStatusHarvester : public edm::EDAnalyzer {
   // last lumi section of the SiPixeDetectorStatus data
   edm::LuminosityBlockNumber_t endLumiBlock_;
 
-  // only for debugging
-  bool dumpTxt_;
-  std::string outTxtFileName_;
+  // "step function" for IOV
+  edm::LuminosityBlockNumber_t stepIOV(edm::LuminosityBlockNumber_t pin, std::map<edm::LuminosityBlockNumber_t,edm::LuminosityBlockNumber_t> IOV);
 
 };
 

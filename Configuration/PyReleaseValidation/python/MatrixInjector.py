@@ -110,7 +110,7 @@ class MatrixInjector(object):
             "Multicore" : 1,   # do not set multicore for the whole chain
             "Memory" : 3000,
             "SizePerEvent" : 1234,
-            "TimePerEvent" : 0.1,
+            "TimePerEvent" : 10,
             "PrepID": os.getenv('CMSSW_VERSION')
             }
 
@@ -212,6 +212,7 @@ class MatrixInjector(object):
             wmsplit['RECODR2_2017reHLT_skimDoubleEG_Prompt']=1
             wmsplit['RECODR2_2017reHLT_skimMET_Prompt']=1
             wmsplit['RECODR2_2017reHLT_skimMuOnia_Prompt']=1
+            wmsplit['RECODR2_2017reHLT_Prompt_L1TEgDQM']=1
             wmsplit['HLTDR2_50ns']=1
             wmsplit['HLTDR2_25ns']=1
             wmsplit['HLTDR2_2016']=1
@@ -361,7 +362,7 @@ class MatrixInjector(object):
                                     processStrPrefix='PU25ns_'
                                 elif   (  s[2][index].split()[  s[2][index].split().index('--pileup')+1 ]  ).find('50ns')  > 0 :
                                     processStrPrefix='PU50ns_'
-                            if 'premix_stage2' in s[2][index] : # take care of pu overlay done with DIGI mixing of premixed events
+                            if 'premix_stage2' in s[2][index] and '--pileup_input' in s[2][index]: # take care of pu overlay done with DIGI mixing of premixed events
                                 if s[2][index].split()[ s[2][index].split().index('--pileup_input')+1  ].find('25ns')  > 0 :
                                     processStrPrefix='PUpmx25ns_'
                                 elif s[2][index].split()[ s[2][index].split().index('--pileup_input')+1  ].find('50ns')  > 0 :
@@ -464,7 +465,7 @@ class MatrixInjector(object):
             itask=0
             if self.keep:
                 for i in self.keep:
-                    if type(i)==int and i < len(chainDict['nowmTasklist']):
+                    if isinstance(i, int) and i < len(chainDict['nowmTasklist']):
                         chainDict['nowmTasklist'][i]['KeepOutput']=True
             for (i,t) in enumerate(chainDict['nowmTasklist']):
                 if t['TaskName'].startswith('HARVEST'):

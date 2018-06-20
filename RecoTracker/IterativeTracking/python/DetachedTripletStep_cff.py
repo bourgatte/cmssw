@@ -60,6 +60,8 @@ for e in [pp_on_XeXe_2017, pp_on_AA_2018]:
                 )
                                                                       )
 )
+from Configuration.Eras.Modifier_highBetaStar_2018_cff import highBetaStar_2018
+highBetaStar_2018.toModify(detachedTripletStepTrackingRegions, RegionPSet = dict(ptMin = 0.05))
 
 
 # seeding
@@ -88,15 +90,6 @@ detachedTripletStepSeeds = _seedCreatorFromRegionConsecutiveHitsTripletOnlyEDPro
         ClusterShapeCacheSrc = cms.InputTag('siPixelClusterShapeCache')
     ),
 )
-import FastSimulation.Tracking.TrajectorySeedProducer_cfi
-_fastSim_detachedTripletStepSeeds = FastSimulation.Tracking.TrajectorySeedProducer_cfi.trajectorySeedProducer.clone(
-    layerList = detachedTripletStepSeedLayers.layerList.value(),
-    trackingRegions = "detachedTripletStepTrackingRegions",
-    hitMasks = cms.InputTag("detachedTripletStepMasks"),
-    seedFinderSelector = dict( pixelTripletGeneratorFactory = _hitSetProducerToFactoryPSet(detachedTripletStepHitTriplets) )
-)
-fastSim.toReplaceWith(detachedTripletStepSeeds,_fastSim_detachedTripletStepSeeds)
-
 
 from RecoPixelVertexing.PixelTriplets.caHitTripletEDProducer_cfi import caHitTripletEDProducer as _caHitTripletEDProducer
 trackingPhase1.toModify(detachedTripletStepHitDoublets, layerPairs = [0,1]) # layer pairs (0,1), (1,2)
@@ -112,6 +105,32 @@ trackingPhase1.toReplaceWith(detachedTripletStepHitTriplets, _caHitTripletEDProd
     CAPhiCut = 0,
     CAHardPtCut = 0.2,
 ))
+highBetaStar_2018.toModify(detachedTripletStepHitTriplets,CAThetaCut = 0.002,CAPhiCut = 0.1,CAHardPtCut = 0)
+
+import FastSimulation.Tracking.TrajectorySeedProducer_cfi
+_fastSim_detachedTripletStepSeeds = FastSimulation.Tracking.TrajectorySeedProducer_cfi.trajectorySeedProducer.clone(
+    trackingRegions = "detachedTripletStepTrackingRegions",
+    hitMasks = cms.InputTag("detachedTripletStepMasks"),
+    seedFinderSelector = dict( pixelTripletGeneratorFactory = _hitSetProducerToFactoryPSet(detachedTripletStepHitTriplets),
+                               layerList = detachedTripletStepSeedLayers.layerList.value())
+)
+#new for phase1
+trackingPhase1.toModify(_fastSim_detachedTripletStepSeeds, seedFinderSelector = dict(
+        pixelTripletGeneratorFactory = None,
+        CAHitTripletGeneratorFactory = _hitSetProducerToFactoryPSet(detachedTripletStepHitTriplets),
+        #new parameters required for phase1 seeding
+        BPix = dict(
+            TTRHBuilder = 'WithoutRefit',
+            HitProducer = 'TrackingRecHitProducer',
+            ),
+        FPix = dict(
+            TTRHBuilder = 'WithoutRefit',
+            HitProducer = 'TrackingRecHitProducer',
+            ),
+        layerPairs = detachedTripletStepHitDoublets.layerPairs.value()
+        )
+)
+fastSim.toReplaceWith(detachedTripletStepSeeds,_fastSim_detachedTripletStepSeeds)
 
 # QUALITY CUTS DURING TRACK BUILDING
 import TrackingTools.TrajectoryFiltering.TrajectoryFilter_cff
@@ -239,6 +258,7 @@ trackingPhase1.toReplaceWith(detachedTripletStep, detachedTripletStepClassifier1
      mva = dict(GBRForestLabel = 'MVASelectorDetachedTripletStep_Phase1'),
      qualityCuts = [-0.2,0.3,0.8],
 ))
+highBetaStar_2018.toModify(detachedTripletStep,qualityCuts = [-0.5,0.0,0.5])
 
 # For LowPU
 import RecoTracker.FinalTrackSelectors.multiTrackSelector_cfi

@@ -2,7 +2,9 @@ import os
 import coral,datetime
 from RecoLuminosity.LumiDB import nameDealer,lumiTime,CommonUtil,lumiCorrections
 import array
-from RecoLuminosity.LumiDB import argparse, nameDealer, selectionParser, hltTrgSeedMapper, \
+import argparse
+
+from RecoLuminosity.LumiDB import  nameDealer, selectionParser, hltTrgSeedMapper, \
      connectstrParser, cacheconfigParser, tablePrinter, csvReporter, csvSelectionParser
 from RecoLuminosity.LumiDB.wordWrappers import wrap_always, wrap_onspace, wrap_onspace_strict
 from pprint import pprint, pformat
@@ -865,7 +867,7 @@ def flatten (obj):
     '''Given nested lists or tuples, returns a single flattened list'''
     result = []
     for piece in obj:
-        if hasattr (piece, '__iter__') and not isinstance (piece, basestring):
+        if hasattr (piece, '__iter__') and not isinstance (piece, str):
             result.extend( flatten (piece) )
         else:
             result.append (piece)
