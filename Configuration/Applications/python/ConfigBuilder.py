@@ -85,6 +85,8 @@ defaultOptions.runsScenarioForMC = None
 defaultOptions.runUnscheduled = False
 defaultOptions.timeoutOutput = False
 defaultOptions.nThreads = '1'
+defaultOptions.nStreams = '0'
+defaultOptions.nConcurrentLumis = '1'
 
 # some helper routines
 def dumpPython(process,name):
@@ -1106,6 +1108,7 @@ class ConfigBuilder(object):
             self.RECODefaultCFF= 'FastSimulation.Configuration.Reconstruction_AftMix_cff'
             self.RECOBEFMIXDefaultCFF = 'FastSimulation.Configuration.Reconstruction_BefMix_cff'
             self.RECOBEFMIXDefaultSeq = 'reconstruction_befmix'
+            self.NANODefaultSeq = 'nanoSequenceFS'
             self.DQMOFFLINEDefaultCFF="FastSimulation.Configuration.DQMOfflineMC_cff"
 
         # Mixing
@@ -2219,7 +2222,8 @@ class ConfigBuilder(object):
             self.pythonCfgCode +="\n"
             self.pythonCfgCode +="#Setup FWK for multithreaded\n"
             self.pythonCfgCode +="process.options.numberOfThreads=cms.untracked.uint32("+self._options.nThreads+")\n"
-            self.pythonCfgCode +="process.options.numberOfStreams=cms.untracked.uint32(0)\n"
+            self.pythonCfgCode +="process.options.numberOfStreams=cms.untracked.uint32("+self._options.nStreams+")\n"
+            self.pythonCfgCode +="process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32("+self._options.nConcurrentLumis+")\n"
         #repacked version
         if self._options.isRepacked:
             self.pythonCfgCode +="\n"
